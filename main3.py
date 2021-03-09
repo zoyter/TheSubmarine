@@ -12,7 +12,7 @@ screen = pg.display.set_mode(SIZE)
 
 def main():
     pg.init()  # Инициализируем pygame
-    # Последовательно запускаем состояния игры
+    # Последовательно запускаем разные состояния игры
     print('Заставка')
     title(screen)
     print('Меню')

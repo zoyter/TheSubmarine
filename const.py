@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import pygame as pg
 import random as rnd
 from pygame.locals import *
