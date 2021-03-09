@@ -102,12 +102,13 @@ class TFish(pg.sprite.Sprite):
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
-        x = random.randint(0,WIDTH-self.image.get_width())
+        x = WIDTH-random.randint(0,100)
         y = random.randint(WATER_LEVEL,HEIGHT-self.image.get_height())
         self.rect = self.rect.move(x,y )
         self.current_time = 0
         self.dx = random.randint(1,5)
-        self.animation_time = 0.01 + self.dx//100
+        self.animation_time = 0.1 - self.dx//10
+        self.dx = -self.dx
 
 
     def cut_sheet(self, sheet, columns, rows):
@@ -121,8 +122,8 @@ class TFish(pg.sprite.Sprite):
 
     def update(self,dt):
         self.rect.x += self.dx
-        if self.rect.x > WIDTH:
-            self.rect.x = -self.image.get_width()
+        if self.rect.x <0-self.image.get_width():
+            self.rect.x = WIDTH
             self.rect.y = random.randint(WATER_LEVEL,HEIGHT-self.image.get_height())
         self.current_time += dt
         if self.current_time >= self.animation_time:
@@ -173,7 +174,6 @@ def game(screen):
 
     player = TPlayer()
     all_sprites = pg.sprite.Group()
-    all_sprites.add(player)
 
     bird = TBird(load_image("bird.png"), 3, 3, 50, 50,t=0.02)
     all_sprites.add(bird)
@@ -183,6 +183,8 @@ def game(screen):
     fishes.append(TFish(load_image("fish2.png"), 6, 1))
     fishes.append(TFish(load_image("fish3.png"), 6, 1))
     all_sprites.add(fishes)
+
+    all_sprites.add(player)
 
     running = True
     clock = pg.time.Clock()
