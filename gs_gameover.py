@@ -2,21 +2,30 @@ from const import *  # Общие константы для всех компо�
 
 
 class TSprite(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
         self.font = pg.font.Font('data/fonts/Ru.ttf', 60)
+        self.font2 = pg.font.Font('data/fonts/Ru.ttf', 40)
         self.img_title = self.font.render('Игра завершена', True, COLORS['title'])
         self.image = pg.Surface((WIDTH, HEIGHT))
         self.rect = self.image.get_rect()
-        self.rect.x = WIDTH //2 - self.img_title.get_width()//2
-        self.rect.y = HEIGHT//2 -self.img_title.get_height()//2
+        self.rect.x = WIDTH // 2 - self.img_title.get_width() // 2
+        self.rect.y = HEIGHT // 2 - self.img_title.get_height() // 2
         self.image.blit(self.img_title, (0, 0))
+        txt = ''
+        if player.isWin and player.isAlive:
+            txt = 'Вы победиили'
+        elif not player.isAlive:
+            txt = 'Вы проиграли'
+        self.img_subtitle = self.font2.render(txt, True, COLORS['title'])
+        self.image.blit(self.img_subtitle, (self.img_subtitle.get_width() // 2, 100))
 
-def gameover(screen):
+
+def gameover(screen, player):
     if DEBUG:
         print('Игра завершена')
 
-    z = TSprite()
+    z = TSprite(player)
     all_sprites = pg.sprite.Group()
     all_sprites.add(z)
 
@@ -24,7 +33,7 @@ def gameover(screen):
     clock = pg.time.Clock()
     tick = pg.time.get_ticks()
     while running:
-        if pg.time.get_ticks()-tick > 2000:
+        if pg.time.get_ticks() - tick > 2000:
             return
         for event in pg.event.get():
             if event.type == QUIT:
@@ -36,6 +45,5 @@ def gameover(screen):
         screen.fill(COLORS['bg'])
         all_sprites.update()
         all_sprites.draw(screen)
-
         pg.display.flip()
         clock.tick(FPS)

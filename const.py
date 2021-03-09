@@ -4,17 +4,19 @@ import random as rnd
 from pygame.locals import *
 
 DEBUG = True
-COLORS={'bg':(0,0,0),'title':(255,0,0),'menu_items':(255,255,255),
-        'menu_selected_item':(255,0,0),'sky':(177,205,252),
-        'water':(77,143,172),'sun':(252,241,75),'oxygen':(177,205,252),
-        'life':(255,0,0),'score':(255,255,255)}
+COLORS = {'bg': (0, 0, 0), 'title': (255, 0, 0), 'menu_items': (255, 255, 255),
+          'menu_selected_item': (255, 0, 0), 'sky': (177, 205, 252),
+          'water': (77, 143, 172), 'sun': (252, 241, 75), 'oxygen': (177, 205, 252),
+          'life': (255, 0, 0), 'score': (255, 255, 255)}
 GAME_STATES = {'title': 0, 'menu': 1, 'game': 2, 'pause': 3, 'gameover': 4}
 SIZE = WIDTH, HEIGHT = 800, 600
-MENU_ITEMS={0:'Начать игру',1:'Музыка вкл.',2:'Выход'}
+MENU_ITEMS = {0: 'Начать игру', 1: 'Музыка вкл.', 2: 'Выход'}
 ICONS_SIZE = 20
 
 isMusic = True
-FPS=60
+FPS = 60
+
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('data/img', name)
     # если файл не существует, то выходим

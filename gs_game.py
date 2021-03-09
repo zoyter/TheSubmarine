@@ -31,8 +31,12 @@ class TPlayer(pg.sprite.Sprite):
         self.life = 3
         self.isAlive = True
         self.score = 0
+        self.isWin = False
 
-    def update(self, *args, **kwargs):
+        self.current_time = 0
+        self.oxygen_dx = 0.001
+
+    def update(self, dt):
         self.image = self.image_normal
         if self.down:
             self.image = self.image_down
@@ -47,15 +51,18 @@ class TPlayer(pg.sprite.Sprite):
         if self.left:
             self.rect.x -= self.dx
         # oxygen
-        if self.rect.y <= WATER_LEVEL - self.rect.height // 3:
-            if self.oxygen < 100:
-                self.oxygen += 1
-        else:
-            if self.oxygen > 0:
-                self.oxygen -= 1
-                if self.oxygen <= 0:
-                    self.life -= 1
-                    self.oxygen = 100
+        self.current_time += dt
+        if self.current_time >= self.oxygen_dx:
+            if self.rect.y <= WATER_LEVEL - self.rect.height // 3:
+                if self.oxygen < 100:
+                    self.oxygen += 1
+            else:
+                if self.oxygen > 0:
+                    self.oxygen -= 1
+                    if self.oxygen <= 0:
+                        self.life -= 1
+                        self.oxygen = 100
+            self.current_time = 0
         if self.life < 0:
             self.isAlive = False
             return
@@ -64,7 +71,6 @@ class TPlayer(pg.sprite.Sprite):
 class TBird(pg.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y, t=0.03):
         pg.sprite.Sprite.__init__(self)
-        # super().__init__(self)
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
@@ -132,6 +138,19 @@ class TFish(pg.sprite.Sprite):
             self.image = self.frames[self.cur_frame]
 
 
+class TCloud(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
+        self.image = load_image('cloud.png')
+        self.rect = self.image.get_rect()
+        self.dx = - random.randint(1, 5)
+
+    def update(self, dt):
+        self.rect.x += self.dx
+        if self.rect.x < 0 - self.image.get_width():
+            self.dx = - random.randint(1, 5)
+            self.rect.x = WIDTH
+            self.rect.y = random.randint(0, WATER_LEVEL - self.image.get_height())
 
 
 def draw_bg(screen):
@@ -179,18 +198,24 @@ def game(screen):
     if DEBUG:
         print('Запустилась игра')
 
-    player = TPlayer()
     all_sprites = pg.sprite.Group()
 
+    player = TPlayer()
     bird = TBird(load_image("bird.png"), 3, 3, 50, 50, t=0.02)
-    all_sprites.add(bird)
 
     fishes = []
     fishes.append(TFish(load_image("fish1.png"), 6, 1))
     fishes.append(TFish(load_image("fish2.png"), 6, 1))
     fishes.append(TFish(load_image("fish3.png"), 6, 1))
-    all_sprites.add(fishes)
 
+    clouds = []
+    for i in range(3):
+        clouds.append(TCloud())
+
+    # Группа для всех спрайтов
+    all_sprites.add(clouds)
+    all_sprites.add(bird)
+    all_sprites.add(fishes)
     all_sprites.add(player)
 
     running = True
@@ -203,7 +228,7 @@ def game(screen):
                 running = False
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    return
+                    return player
                 if event.key == K_UP:
                     player.up = True
                 if event.key == K_DOWN:
@@ -229,3 +254,4 @@ def game(screen):
 
         pg.display.flip()
         clock.tick(FPS)
+    return player
