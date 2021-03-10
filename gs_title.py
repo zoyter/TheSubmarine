@@ -25,10 +25,11 @@ def title(screen):
         for event in pg.event.get():
             if event.type == QUIT:
                 running = False
+                game_state.current = game_state.quit
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    running = False
-                    game_state.current = game_state.menu
+                running = False
+                game_state.current = game_state.menu
+
         screen.fill(COLORS.bg)
         all_sprites.update()
         all_sprites.draw(screen)
