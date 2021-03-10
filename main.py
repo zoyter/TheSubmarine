@@ -11,6 +11,7 @@ from gs_gameover import *  # игра завершена
 screen = pg.display.set_mode(SIZE)
 
 
+
 def main():
     pg.init()  # Инициализируем pygame
     # Последовательно запускаем разные состояния игры

@@ -2,8 +2,8 @@ from const import *  # Общие константы для всех компо�
 
 
 class TMenu(pg.sprite.Sprite):
-    def __init__(self):
-        pg.sprite.Sprite.__init__(self)
+    def __init__(self,*group):
+        super().__init__(*group)
         self.font = pg.font.Font('data/fonts/Ru.ttf', 60)
         self.img_title = self.font.render('The Submarin', True, COLORS['title'])
         self.image = pg.Surface((WIDTH, HEIGHT))

@@ -1,108 +1,38 @@
-import os, sys
-import pygame as pg
-import random as rnd
 from pygame.locals import *
 
-from const import * # Общие константы для всех компонентов игры
+from const import *  # Общие константы для всех компонентов игры
 
-class TTitle(pg.sprite.Sprite):
-    def __init__(self):
-        pg.sprite.Sprite.__init__(self)
-        self.bg = [0, 0, 0]
-        self.color = [0, 0, 0]
-        self.color_target = [255, 0, 0]
-        self.color_step = 5
-        self.text = 'The Submarin'
-        self.font = pg.font.Font('data/fonts/Ru.ttf', 60)
-        txt = self.font.render(self.text, True, self.color)
-        self.image = pg.Surface((txt.get_width(), txt.get_height()))
-        colorkey = self.image.get_at((0, 0))
-        self.image.set_colorkey(colorkey)
-        self.rect = self.image.get_rect()
-        self.rect.x = WIDTH // 2 - txt.get_width() // 2
-        self.rect.y = HEIGHT // 2 - txt.get_height() // 2
-        self.image.blit(txt, (0, 0))
-
-    def update(self):
-        if self.color != self.color_target:
-            for i in range(len(self.color)):
-                self.color[i] += self.color_step
-                if self.color[i] >= self.color_target[i]:
-                    self.color[i] = self.color_target[i]
-                if self.color[i] > 255:
-                    self.color = 255
-            txt = self.font.render(self.text, True, self.color)
-            self.image = pg.Surface((txt.get_width(), txt.get_height()))
-            self.image.blit(txt, (0, 0))
-
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
-
-class TTitle_Blink(pg.sprite.Sprite):
-    def __init__(self):
-        pg.sprite.Sprite.__init__(self)
-        self.bg = [0, 0, 0]
-        self.color = [0, 0, 0]
-        self.color_target = [0, 255, 0]
-        self.color_step = 3
-        self.text = 'нажми любую клавишу'
-        self.font = pg.font.Font('data/fonts/Ru.ttf', 30)
-        txt = self.font.render(self.text, True, self.color)
-        self.image = pg.Surface((txt.get_width(), txt.get_height()))
-        colorkey = self.image.get_at((0, 0))
-        self.image.set_colorkey(colorkey)
-        self.rect = self.image.get_rect()
-        self.rect.x = WIDTH // 2 - txt.get_width() // 2
-        self.rect.y = HEIGHT - HEIGHT // 3 - txt.get_height() // 2
-        self.image.blit(txt, (0, 0))
-
-    def update(self):
-        if self.color != self.color_target:
-            for i in range(len(self.color)):
-                self.color[i] += self.color_step
-                if self.color[i] > 255:
-                    self.color[i] = 255
-                    self.color_step=-self.color_step
-                if self.color[i]<0:
-                    self.color[i]=0
-                    self.color_step=-self.color_step
-
-            txt = self.font.render(self.text, True, self.color)
-            self.image = pg.Surface((txt.get_width(), txt.get_height()))
-            self.image.blit(txt, (0, 0))
-
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
 
 def title(screen):
     if DEBUG:
         print('Запустилась заставка')
 
-    z=TTitle()
-    z2 = TTitle_Blink()
-    title_sprites = pg.sprite.Group()
-    title_sprites.add(z)
-    title_sprites.add(z2)
+    all_sprites = pg.sprite.Group()
+    x = WIDTH * 0.5
+    y = HEIGHT * 0.3
+    game_title = TText(text=caption.game_name, color=COLORS.title, font=FONTS.font1, xy=(x, y))
+    all_sprites.add(game_title)
 
-    font = pg.font.Font('data/fonts/Ru.ttf',60)
+    x = WIDTH * 0.5
+    y = HEIGHT * 0.9
+    press_any_key = TBlinkText(text=caption.press_any_key, color=COLORS.menu_items, font=FONTS.font2, xy=(x, y))
+    all_sprites.add(press_any_key)
 
-    running = True
     clock = pg.time.Clock()
+    tick = pg.time.get_ticks()
+    running = True
     while running:
-        # внутри игрового цикла ещё один цикл
-        # приема и обработки сообщений
         for event in pg.event.get():
-            # при закрытии окна
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN:
-                return GAME_STATES['menu']
-        screen.fill((0,0,0))
-        title_sprites.update()
-        title_sprites.update()
-        title_sprites.draw(screen)
-
+                if event.key == K_ESCAPE:
+                    running = False
+                    game_state.current = game_state.menu
+        screen.fill(COLORS.bg)
+        all_sprites.update()
+        all_sprites.draw(screen)
         pg.display.flip()
         clock.tick(FPS)
-    return GAME_STATES['menu']
 
+    return
