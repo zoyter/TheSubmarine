@@ -96,7 +96,7 @@ def title(screen):
             if event.type == QUIT:
                 running = False
             if event.type == KEYDOWN:
-                return
+                return GAME_STATES['menu']
         screen.fill((0,0,0))
         title_sprites.update()
         title_sprites.update()
@@ -104,4 +104,5 @@ def title(screen):
 
         pg.display.flip()
         clock.tick(FPS)
+    return GAME_STATES['menu']
 

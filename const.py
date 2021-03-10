@@ -9,12 +9,13 @@ COLORS = {'bg': (0, 0, 0), 'title': (255, 0, 0), 'menu_items': (255, 255, 255),
           'menu_selected_item': (255, 0, 0), 'sky': (177, 205, 252),
           'water': (77, 143, 172), 'sun': (252, 241, 75), 'oxygen': (177, 205, 252),
           'life': (255, 0, 0), 'score': (255, 255, 255)}
-GAME_STATES = {'title': 0, 'menu': 1, 'game': 2, 'pause': 3, 'gameover': 4}
+GAME_STATES = {'title': 0, 'menu': 1, 'game': 2, 'score': 3, 'gameover': 4, 'quit': 99}
 SIZE = WIDTH, HEIGHT = 800, 600
-MENU_ITEMS = {0: 'Начать игру', 1: 'Музыка вкл.', 2: 'Выход'}
+MENU_ITEMS = {0: 'Начать игру', 1: 'Музыка вкл.', 2: 'Счёт', 3: 'Выход'}
 ICONS_SIZE = 20
 
 isMusic = True
+music_volume = 0.4
 FPS = 60
 
 

@@ -13,15 +13,16 @@ class TSprite(pg.sprite.Sprite):
         self.rect.y = HEIGHT // 2 - self.img_title.get_height() // 2
         self.image.blit(self.img_title, (0, 0))
         txt = ''
-        if player.isWin and player.isAlive:
-            txt = 'Вы победиили'
-        elif not player.isAlive:
-            txt = 'Вы проиграли'
+        if player:
+            if player.isWin and player.isAlive:
+                txt = 'Вы победиили'
+            elif not player.isAlive:
+                txt = 'Вы проиграли'
         self.img_subtitle = self.font2.render(txt, True, COLORS['title'])
         self.image.blit(self.img_subtitle, (self.img_subtitle.get_width() // 2, 100))
 
 
-def gameover(screen, player):
+def gameover(screen, player=None):
     if DEBUG:
         print('Игра завершена')
 
@@ -34,16 +35,18 @@ def gameover(screen, player):
     tick = pg.time.get_ticks()
     while running:
         if pg.time.get_ticks() - tick > 2000:
-            return
+            return GAME_STATES['quit']
         for event in pg.event.get():
             if event.type == QUIT:
                 running = False
+                return GAME_STATES['quit']
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    return
+                    return GAME_STATES['quit']
 
         screen.fill(COLORS['bg'])
         all_sprites.update()
         all_sprites.draw(screen)
         pg.display.flip()
         clock.tick(FPS)
+    return GAME_STATES['quit']

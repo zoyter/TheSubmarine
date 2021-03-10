@@ -26,18 +26,22 @@ class TMenu(pg.sprite.Sprite):
             y = HEIGHT * 0.1 + self.img_title.get_height() + self.img_title.get_height() * 0.05
             y += i * self.img_item.get_height() + self.img_item.get_height() * 0.2
             self.image.blit(self.img_item, (x, y))
+        self.img_volume = self.font.render('/'*int(music_volume*10), True, COLORS['menu_items'])
+        x = WIDTH - self.img_volume.get_width()
+        y = HEIGHT - self.img_volume.get_height()
+        self.image.blit(self.img_volume, (x, y))
 
     def update(self):
         self.image.fill(COLORS['bg'])
         if isMusic:
-            MENU_ITEMS[1] = 'Музыка вкл.'
+            MENU_ITEMS[1] = 'Музыка вкл. ('+str(int(music_volume*10))+')'
         else:
-            MENU_ITEMS[1] = 'Музыка выкл.'
+            MENU_ITEMS[1] = 'Музыка выкл.('+str(int(music_volume*10))+')'
         self.draw_items()
 
 
 def menu(screen):
-    global isMusic
+    global isMusic, music_volume
     if DEBUG:
         print('Запустилось меню перед игрой')
 
@@ -47,6 +51,12 @@ def menu(screen):
 
     running = True
     clock = pg.time.Clock()
+
+
+    pg.mixer.music.load('data/music/the_guta_jasna_-_underwater_mind.ogg')
+    if isMusic:
+        pg.mixer.music.play()
+
     while running:
         for event in pg.event.get():
             if event.type == QUIT:
@@ -61,15 +71,30 @@ def menu(screen):
                     if main_menu.item_cur < 0:
                         main_menu.item_cur = len(MENU_ITEMS) - 1
                 if event.key == K_RETURN:
-                    if main_menu.item_cur == len(MENU_ITEMS) - 1:
-                        running = False
                     if main_menu.item_cur == 0:
-                        return
+                        return GAME_STATES['game']
+
+                    if main_menu.item_cur == 3:
+                        return GAME_STATES['gameover']
+
                     if main_menu.item_cur == 1:
                         isMusic = not isMusic
-                if event.key == K_LEFT or event.key == K_RIGHT:
+                        if isMusic:
+                            pg.mixer.music.play()
+                        else:
+                            pg.mixer.music.stop()
+                if event.key == K_LEFT:
                     if main_menu.item_cur == 1:
-                        isMusic = not isMusic
+                        music_volume -=0.1
+                        if music_volume<0:
+                            music_volume=0
+                        pg.mixer.music.set_volume(music_volume)
+                if event.key == K_RIGHT:
+                    if main_menu.item_cur == 1:
+                        music_volume +=0.1
+                        if music_volume>1:
+                            music_volume=1
+                        pg.mixer.music.set_volume(music_volume)
 
         screen.fill(COLORS['bg'])
         all_sprites.update()
@@ -77,3 +102,4 @@ def menu(screen):
 
         pg.display.flip()
         clock.tick(FPS)
+    return GAME_STATES['gameover']

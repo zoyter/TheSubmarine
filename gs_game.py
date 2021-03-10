@@ -30,7 +30,7 @@ class TPlayer(pg.sprite.Sprite):
         self.dx = 5
         self.dy = 5
         self.oxygen = 50
-        self.life = 3
+        self.life = 15
         self.isAlive = True
         self.score = 0
         self.isWin = False
@@ -322,12 +322,6 @@ def game(screen):
     boom = TBoom(load_image("boom.png"), 16, 1, 50, 50, t=0.02)
     all_boom.add(boom)
 
-
-
-
-
-
-
     running = True
     clock = pg.time.Clock()
     while running and player.isAlive:
@@ -338,7 +332,7 @@ def game(screen):
                 running = False
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    return player
+                    return GAME_STATES['gameover'],player
                 if event.key == K_UP:
                     player.up = True
                 if event.key == K_DOWN:
@@ -377,4 +371,4 @@ def game(screen):
 
         pg.display.flip()
         clock.tick(FPS)
-    return player
+    return GAME_STATES['gameover'], player
