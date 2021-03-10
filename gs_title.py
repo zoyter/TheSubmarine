@@ -15,7 +15,7 @@ def title(screen):
 
     x = WIDTH * 0.5
     y = HEIGHT * 0.9
-    press_any_key = TBlinkText(text=caption.press_any_key, color=COLORS.menu_items, font=FONTS.font2, xy=(x, y))
+    press_any_key = TBlinkText(text=caption.press_any_key, color=COLORS.menu_items, font=FONTS.font4, xy=(x, y))
     all_sprites.add(press_any_key)
 
     clock = pg.time.Clock()

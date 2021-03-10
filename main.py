@@ -2,7 +2,7 @@ import pygame as pg
 
 # Загружаем функции различных состояний игры из соответствующих файлов
 from gs_title import *  # заставка
-from gs_menu import *  # меню
+from gs_menu_old import *  # меню
 from gs_game import *  # игра
 from gs_score import *  # счёт
 from gs_gameover import *  # игра завершена

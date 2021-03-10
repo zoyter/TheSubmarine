@@ -9,10 +9,8 @@ DEBUG = True  # вкл/выкл вывод отладочных сообщени
 
 SIZE = WIDTH, HEIGHT = 800, 600  # Размеры окна
 TILE_SIZE = 20  # Размер плитки, для загрузки карты мира (если пригодится :-) )
-MAX_FONT_SIZE = 60
 # Пункты меню и их соответствие состояниям игры
-MENU_ITEMS = ['Начать игру', 'Музыка вкл.', 'Счёт', 'Выход']
-MENU_ITEMS_TO_GS = [2, -1, 3, 5]
+MENU_ITEMS = ['Начать игру', 'Музыка', 'Счёт', 'Выход']
 
 FPS = 60  # Частоста обновления экрана
 # Пути к директориям с данными
@@ -31,11 +29,19 @@ class TCaption:
     def ru(self):
         self.game_name='The Submarin'
         self.press_any_key = 'Нажми любую клавишу'
-        MENU_ITEMS = ['Начать игру', 'Музыка вкл.', 'Счёт', 'Выход']
+        self.music_on='вкл.'
+        self.music_off='выкл.'
+        self.music_volume = 'громкость'
+        self.hiscore = 'Счёт'
+        MENU_ITEMS = ['Начать игру', 'Музыка', 'Счёт', 'Выход']
     def en(self):
         self.game_name='The Submarin'
         self.press_any_key = 'Press any key'
-        MENU_ITEMS = ['Start game', 'Music on', 'Score', 'Exit']
+        self.music_on='on'
+        self.music_off='off'
+        self.music_volume = 'volume'
+        self.hiscore = 'Hi Score'
+        MENU_ITEMS = ['Start game', 'Music', 'Score', 'Exit']
 
 class TColor():  # Цвета, используемые в игре
     def __init__(self):
@@ -73,14 +79,21 @@ class TFonts():  # Шрифты нескольких размеров
     def __init__(self, name):
         fullname = os.path.join(DATA_DIR, FONTS_DIR)
         fullname = os.path.join(fullname, name)
-        self.font1 = pg.font.Font(fullname, MAX_FONT_SIZE)
-        self.font2 = pg.font.Font(fullname, MAX_FONT_SIZE - 20)
-        self.font3 = pg.font.Font(fullname, MAX_FONT_SIZE - 20)
+        self.font1 = pg.font.Font(fullname, 60)
+        self.font2 = pg.font.Font(fullname, 50)
+        self.font3 = pg.font.Font(fullname, 40)
+        self.font4 = pg.font.Font(fullname, 30)
+        self.font5 = pg.font.Font(fullname, 20)
+        self.font6 = pg.font.Font(fullname, 10)
 
 
 FONTS = TFonts('Ru.ttf')
 game_state = TGameStates()
 caption = TCaption('ru')
+isMusic = True
+music_volume = 5
+MUSIC_ITEM_N = 1
+MUSIC_VOLUME_MAX=10
 
 
 def load_image(name, colorkey=None):  # Загрузка картинок
@@ -115,22 +128,33 @@ class TText(pg.sprite.Sprite):  # Текстовые надписи
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
-    def set_new_text(self, text):
-        self.image.fill((0, 0, 0))
+    def set_new_text(self, text, cur_item=0):
+        self.image.fill(COLORS.bg)
         self.text = text
         self.image_txt = self.font.render(self.text, True, self.color)
-        x, y = self.rect.x, self.rect.y
+        # x, y = self.rect.x, self.rect.y
         self.rect = self.image_txt.get_rect()
+        x = WIDTH * 0.5
+        y = HEIGHT * 0.3 + cur_item * self.rect.height
         self.rect.center = (x, y)
-        # self.rect.x, self.rect.y = x, y
         self.image = pg.Surface((self.rect.width, self.rect.height))
         colorkey = self.image.get_at((0, 0))
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
+
     def set_xy(self, x=0, y=0):
         self.rect.x = x
         self.rect.y = y
+
+    def active_item(self, isActive = False):
+        if isActive:
+            self.color=COLORS.title
+        else:
+            self.color = COLORS.menu_items
+        self.image_txt = self.font.render(self.text, True, self.color)
+        self.image.fill(COLORS.bg)
+        self.image.blit(self.image_txt, (0, 0))
 
     def draw(self, screen):
         screen.blit(self.image, (100, 0))
@@ -154,13 +178,14 @@ class TBlinkText(pg.sprite.Sprite):
         self.image.blit(self.image_txt, (0, 0))
 
     def set_new_text(self, text):
-        self.image.fill((0, 0, 0))
+        self.image.fill(COLORS.bg)
         self.text = text
         self.image_txt = self.font.render(self.text, True, self.color)
-        x, y = self.rect.x, self.rect.y
+        # x, y = self.rect.x, self.rect.y
         self.rect = self.image_txt.get_rect()
+        x = WIDTH * 0.5
+        y = HEIGHT * 0.9
         self.rect.center = (x, y)
-        # self.rect.x, self.rect.y = x, y
         self.image = pg.Surface((self.rect.width, self.rect.height))
         colorkey = self.image.get_at((0, 0))
         self.image.set_colorkey(colorkey)

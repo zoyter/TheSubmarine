@@ -4,6 +4,8 @@ pg.init()
 pg.font.init()
 
 from gs_title import *
+from gs_menu import *
+from gs_score import *
 
 isMusic = True
 music_volume = 0.4
@@ -35,11 +37,11 @@ def main():
         if game_state.current == game_state.title:
             title(screen)
         if game_state.current == game_state.menu:
-            print('menu')
+            menu(screen)
         if game_state.current == game_state.game:
             print('game')
         if game_state.current == game_state.score:
-            print('score')
+            score(screen)
         if game_state.current == game_state.gameover:
             print('gameover')
         if game_state.current == game_state.quit:
