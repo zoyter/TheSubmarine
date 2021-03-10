@@ -60,3 +60,22 @@ pyinstaller --onefile --noconsole main.py
 
 - возможность автоматического скролинга мира при движении вправо
 - больше анимации и разнообразных спрайтов
+
+## Ресурсы
+
+###Музыка:
+
+- [underwater_mind (2011) the guta jasna](https://www.jamendo.com/track/854045/underwater_mind)
+- [Deep Underwater Panda](https://www.jamendo.com/album/187523/deep-underwater)
+
+###Звуки:
+- ...
+- ...
+
+###Изображения:
+
+- [player1.png]()
+- [bird.png]()
+-  [bird.png]()
+- [diver.png] (https://cdn4.vectorstock.com/i/1000x1000/94/83/diver-boy-swimming-sprite-vector-3509483.jpg)
+
