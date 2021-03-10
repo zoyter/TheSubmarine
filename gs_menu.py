@@ -74,6 +74,9 @@ def menu(screen):
                     if MENU_ITEMS[cur_menu_item] == MENU_ITEMS[-2]:
                         running = False
                         game_state.current = game_state.score
+                    if MENU_ITEMS[cur_menu_item] == MENU_ITEMS[0]:
+                        running = False
+                        game_state.current = game_state.game
                 if event.key == K_LEFT:
                     music_volume -= 1
                     if music_volume <= 0:

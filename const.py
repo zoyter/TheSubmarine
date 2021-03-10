@@ -94,6 +94,7 @@ isMusic = True
 music_volume = 5
 MUSIC_ITEM_N = 1
 MUSIC_VOLUME_MAX=10
+ICONS_SIZE = WIDTH*0.02
 
 
 def load_image(name, colorkey=None):  # Загрузка картинок
@@ -210,3 +211,8 @@ class TBlinkText(pg.sprite.Sprite):
 
     def draw(self, screen):
         screen.blit(self.image, (100, 0))
+
+SUN_WIDTH = WIDTH * 0.1
+SUN_WIDTH_MAX = WIDTH * 0.2
+SUN_DX = 1
+WATER_LEVEL = HEIGHT // 3

@@ -1,56 +1,24 @@
 import random
 
-from pygame.locals import *
-
 from const import *  # Общие константы для всех компонентов игры
 
-class TSun(pg.sprite.Sprite):  # Солнце
-    def __init__(self,*group):
-        super().__init__(*group)
-        self.dw = -1
-        self.width = SUN_WIDTH
-        self.min_width = SUN_WIDTH *0.8
-        self.image = pg.Surface((self.width, self.width))
-        self.rect = self.image.get_rect()
-        self.rect.center = (50,50)
-        colorkey = self.image.get_at((0, 0))
-        self.image.set_colorkey(colorkey)
-        pg.draw.ellipse(self.image, COLORS.sun, (0,0,self.width,self.width))
 
-        self.animation_time = 0.02
-        self.current_time = 0
 
-    def update(self, *args, **kwargs):
-        if 'dt' in kwargs:
-            self.current_time += kwargs['dt']
-            if self.current_time >= self.animation_time:
-                self.current_time = 0
-                self.width+=self.dw
-                if self.width >=SUN_WIDTH:
-                    self.width = SUN_WIDTH
-                    self.dw = -self.dw
-                elif self.width<=self.min_width:
-                    self.width=self.min_width
-                    self.dw = -self.dw
-        self.image.fill(COLORS.bg)
-        colorkey = self.image.get_at((0, 0))
-        self.image.set_colorkey(colorkey)
-        pg.draw.ellipse(self.image, COLORS.sun, (0,0,self.width,self.width))
 
 class TPlayer(pg.sprite.Sprite):
-    def __init__(self,*group):
-        super().__init__(*group)
-        self.images=[]
-        self.images.append(load_image('player1.png'))
-        self.images.append(load_image('player2.png'))
-        self.images.append(load_image('player3.png'))
-        self.image = self.images[0]
-
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
+        self.image = load_image('player1.png')
+        self.image_normal = load_image('player1.png')
+        self.image_up = load_image('player2.png')
+        self.image_down = load_image('player3.png')
         self.rect = self.image.get_rect()
         self.rect.y = HEIGHT // 2
         self.rect.x = 100
 
         self.mask = pg.mask.from_surface(self.image)
+
+        self.font = pg.font.Font('data/fonts/Ru.ttf', 30)
 
         self.up = False
         self.down = False
@@ -78,23 +46,23 @@ class TPlayer(pg.sprite.Sprite):
         self.isBoom = False
         self.BoomTime = self.BoomTimeMax
 
-    def update(self, *args, **kwargs):
+    def update(self, dt, player):
         if not self.isBoom:
-            self.image = self.images[0]
+            self.image = self.image_normal
+            if self.down:
+                self.image = self.image_down
+                self.rect.y += self.dy
             if self.up:
-                self.image = self.images[1]
+                self.image = self.image_up
                 self.rect.y -= self.dy
                 if self.rect.y < WATER_LEVEL - self.rect.height // 2:
                     self.rect.y = WATER_LEVEL - self.rect.height // 2
-            if self.down:
-                self.image = self.images[2]
-                self.rect.y += self.dy
             if self.right:
                 self.rect.x += self.dx
             if self.left:
                 self.rect.x -= self.dx
             # oxygen
-            self.current_time += kwargs['dt']
+            self.current_time += dt
             if self.current_time >= self.oxygen_dx:
                 if self.rect.y <= WATER_LEVEL - self.rect.height // 3:
                     if self.oxygen < 100:
@@ -108,7 +76,8 @@ class TPlayer(pg.sprite.Sprite):
                 self.current_time = 0
             if self.life < 0:
                 self.isAlive = False
-                game_state.current=game_state.gameover
+                return
+
 
 class TBoom(pg.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y, t=0.03):
@@ -130,18 +99,19 @@ class TBoom(pg.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pg.Rect(
                     frame_location, self.rect.size)))
 
-    def update(self, *args, **kwargs):
-        if kwargs['player'].isBoom:
-            self.rect = kwargs['player'].rect
-            self.current_time += kwargs['dt']
+    def update(self, dt, player):
+        if player.isBoom:
+            self.rect = player.rect
+            self.current_time += dt
             if self.current_time >= self.animation_time:
                 self.current_time = 0
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
                 self.image = self.frames[self.cur_frame]
             if self.cur_frame >= len(self.frames)-1:
-                kwargs['player'].boom_stop()
-                kwargs['player'].rect.x = 0
-                kwargs['player'].rect.y = WATER_LEVEL
+                player.boom_stop()
+                player.rect.x = 0
+                player.rect.y = WATER_LEVEL
+
 
 class TBird(pg.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y, t=0.03):
@@ -164,16 +134,17 @@ class TBird(pg.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pg.Rect(
                     frame_location, self.rect.size)))
 
-    def update(self, *args, **kwargs):
+    def update(self, dt, player):
         self.rect.x += self.dx
         if self.rect.x > WIDTH:
             self.rect.x = -self.image.get_width()
             self.rect.y = random.randint(0, WATER_LEVEL - self.image.get_height())
-        self.current_time += kwargs['dt']
+        self.current_time += dt
         if self.current_time >= self.animation_time:
             self.current_time = 0
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
+
 
 class TFish(pg.sprite.Sprite):
     def __init__(self, sheet, columns, rows):
@@ -200,24 +171,25 @@ class TFish(pg.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pg.Rect(
                     frame_location, self.rect.size)))
 
-    def update(self, *args, **kwargs):
+    def update(self, dt, player):
         self.rect.x += self.dx
         if self.rect.x < 0 - self.image.get_width():
             self.rect.x = WIDTH
             self.rect.y = random.randint(WATER_LEVEL, HEIGHT - self.image.get_height())
-        self.current_time += kwargs['dt']
+        self.current_time += dt
         if self.current_time >= self.animation_time:
             self.current_time = 0
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
             self.mask = pg.mask.from_surface(self.image)
-        if pg.sprite.collide_mask(self, kwargs['player']):
+        if pg.sprite.collide_mask(self, player):
             if DEBUG:
                 print('Столкновение с рыбой')
-            kwargs['player'].boom_start()
-        if kwargs['player'].isBoom:
+            player.boom_start()
+        if player.isBoom:
             self.rect.x = WIDTH
             self.rect.y = random.randint(WATER_LEVEL, HEIGHT - self.image.get_height())
+
 
 class TCloud(pg.sprite.Sprite):
     def __init__(self):
@@ -226,12 +198,13 @@ class TCloud(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.dx = - random.randint(1, 5)
 
-    def update(self, *args, **kwargs):
+    def update(self, dt, player):
         self.rect.x += self.dx
         if self.rect.x < 0 - self.image.get_width():
             self.dx = - random.randint(1, 5)
             self.rect.x = WIDTH
             self.rect.y = random.randint(0, WATER_LEVEL - self.image.get_height())
+
 
 class TDiver(pg.sprite.Sprite):
     def __init__(self, sheet, columns, rows, t=0.03):
@@ -267,16 +240,21 @@ class TDiver(pg.sprite.Sprite):
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
 
+
 def draw_bg(screen):
     sky = pg.Rect((0, 0, WIDTH, HEIGHT // 3))
     water = pg.Rect((0, WATER_LEVEL, WIDTH, HEIGHT))
-    pg.draw.rect(screen, COLORS.sky, sky)
-    pg.draw.rect(screen, COLORS.water, water)
+    pg.draw.rect(screen, COLORS['sky'], sky)
+    pg.draw.rect(screen, COLORS['water'], water)
+    sun = pg.Rect((0, 0, SUN_WIDTH, SUN_WIDTH))
+    pg.draw.ellipse(screen, COLORS['sun'], sun)
+
 
 def draw_gui(screen, player):
     draw_oxygen(screen, player)
     draw_life(screen, player)
     draw_score(screen, player)
+
 
 def draw_oxygen(screen, player):
     w = ICONS_SIZE
@@ -284,7 +262,7 @@ def draw_oxygen(screen, player):
     for x in range(player.oxygen // 10):
         x1 = x * w
         r1 = pg.Rect((x1, y, w, w))
-        pg.draw.ellipse(screen, COLORS.oxygen, r1)
+        pg.draw.ellipse(screen, COLORS['oxygen'], r1)
 
 
 def draw_life(screen, player):
@@ -293,26 +271,31 @@ def draw_life(screen, player):
     for x in range(player.life, 0, -1):
         x1 = WIDTH - x * w
         r1 = pg.Rect((x1, y, w, w))
-        pg.draw.ellipse(screen, COLORS.life, r1)
+        pg.draw.ellipse(screen, COLORS['life'], r1)
 
 
 def draw_score(screen, player):
-    txt_score = FONTS.font4.render(str(player.score), True, COLORS.menu_items)
-    x = WIDTH - txt_score.get_width()
-    y = HEIGHT*0.001
+    txt_score = player.font.render(str(player.score), True, COLORS['menu_items'])
+    w = ICONS_SIZE
+    x = WIDTH // 2 - txt_score.get_width() // 2
+    y = HEIGHT - txt_score.get_height()
     screen.blit(txt_score, (x, y))
+
 
 def game(screen):
     if DEBUG:
         print('Запустилась игра')
 
     all_sprites = pg.sprite.Group()
-    sun = TSun(all_sprites)
+    all_players = pg.sprite.Group()
     # групп для тех, кто причинят вред
     all_enemy = pg.sprite.Group()
     # Группа для тех, кто причиняет пользу :-)
     all_good = pg.sprite.Group()
     all_boom = pg.sprite.Group()
+
+    player = TPlayer()
+    all_players.add(player)
 
     bird = TBird(load_image("bird.png"), 3, 3, 50, 50, t=0.02)
     all_sprites.add(bird)
@@ -336,25 +319,17 @@ def game(screen):
     boom = TBoom(load_image("boom.png"), 16, 1, 50, 50, t=0.02)
     all_boom.add(boom)
 
-    all_players = pg.sprite.Group()
-    player = TPlayer(all_players)
-
-
-    clock = pg.time.Clock()
-    tick = pg.time.get_ticks()
     running = True
-    while running:
-        if game_state.current != game_state.game:
-            running = False
+    clock = pg.time.Clock()
+    while running and player.isAlive:
         dt = clock.tick(FPS) / 1000
+
         for event in pg.event.get():
             if event.type == QUIT:
                 running = False
-                game_state.current = game_state.quit
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-                    game_state.current = game_state.menu
+                    return GAME_STATES['gameover'],player
                 if event.key == K_UP:
                     player.up = True
                 if event.key == K_DOWN:
@@ -372,22 +347,16 @@ def game(screen):
                     player.right = False
                 if event.key == K_LEFT:
                     player.left = False
-
-        screen.fill(COLORS.bg)
         draw_bg(screen)
-
-        all_sprites.update(dt=dt,player=player)
+        all_sprites.update(dt, player)
         if not player.isBoom:
-            all_enemy.update(dt=dt,player=player)
-            all_good.update(dt=dt,player=player)
-            all_players.update(dt=dt,player=player)
+            all_enemy.update(dt, player)
+            all_good.update(dt, player)
+            all_players.update(dt, player)
         else:
-            all_boom.update(dt=dt,player=player)
-
-        all_players.update(dt=dt, player=player)
+            all_boom.update(dt, player)
 
         all_sprites.draw(screen)
-        all_players.draw(screen)
 
         if not player.isBoom:
             all_enemy.draw(screen)
@@ -395,7 +364,8 @@ def game(screen):
             all_players.draw(screen)
         else:
             all_boom.draw(screen)
-
         draw_gui(screen, player)
+
         pg.display.flip()
         clock.tick(FPS)
+    return GAME_STATES['gameover'], player
