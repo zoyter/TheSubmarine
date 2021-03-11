@@ -45,8 +45,6 @@ def menu(screen):
     all_sprites.add(items)
     set_active_item(items, cur_menu_item)
 
-
-
     clock = pg.time.Clock()
     tick = pg.time.get_ticks()
     running = True

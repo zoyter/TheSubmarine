@@ -1,7 +1,8 @@
-from const import *  # Общие константы для всех компонентов игры
 from pygame.locals import *
 
-abc = 'qwertyuiopasdfghjklzxcvbnm '#chr(8)
+from const import *  # Общие константы для всех компонентов игры
+
+abc = 'qwertyuiopasdfghjklzxcvbnm '  # chr(8)
 
 
 def input_name(key, username):
@@ -17,13 +18,11 @@ def gameover(screen, user_score):
     if DEBUG:
         print('Игра завершена')
 
-
     all_sprites = pg.sprite.Group()
     x = WIDTH * 0.5
     y = HEIGHT * 0.4
     name_input = TText(text=caption.gameover, color=COLORS.menu_items, font=FONTS.font1, xy=(x, y))
     all_sprites.add(name_input)
-
 
     x = WIDTH * 0.5
     y = HEIGHT * 0.6
@@ -36,16 +35,14 @@ def gameover(screen, user_score):
 
     while running:
         if pg.time.get_ticks() - tick > 2000:
-            running=False
-            game_state.current=game_state.username
+            running = False
+            game_state.current = game_state.username
         for event in pg.event.get():
             if event.type == QUIT:
                 running = False
                 game_state.current = game_state.quit
-            if event.type==KEYDOWN:
+            if event.type == KEYDOWN:
                 game_state.current = game_state.username
-
-
 
         screen.fill(COLORS.bg)
         all_sprites.update()

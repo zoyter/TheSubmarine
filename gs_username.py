@@ -15,19 +15,19 @@ def input_name(key, username):
     return username
 
 
-def save_user_score(username,user_score=0):
+def save_user_score(username, user_score=0):
     if user_score <= 0:
         return
     db = os.path.join(DATA_DIR, "db.sqlite")
     con = sqlite3.connect(db)
     cur = con.cursor()
-    cur.execute("insert into info values (Null, '%s', '%s') "%(username, user_score))
+    cur.execute("insert into info values (Null, '%s', '%s') " % (username, user_score))
     con.commit()
     con.close()
     return
 
 
-def enter_username(screen,user_score):
+def enter_username(screen, user_score):
     global username
     if DEBUG:
         print('Игра завершена')
@@ -72,7 +72,7 @@ def enter_username(screen,user_score):
                 name_input.rect.y = y
                 if event.key == K_RETURN or event.key == K_ESCAPE:
                     running = False
-                    save_user_score(username,user_score)
+                    save_user_score(username, user_score)
                     game_state.current = game_state.score
 
         screen.fill(COLORS.bg)

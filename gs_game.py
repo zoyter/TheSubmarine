@@ -13,9 +13,9 @@ class TSun(pg.sprite.Sprite):  # Солнце
     def __init__(self, *group):
         super().__init__(*group)
         # константы размеров солнца
-        self.SUN_WIDTH = WIDTH * 0.1 # Размеры солнца
-        self.SUN_WIDTH_MAX = WIDTH * 0.2 # Максимальные размеры солнца
-        self.dw = -1 # шаг изменения размеров солнца
+        self.SUN_WIDTH = WIDTH * 0.1  # Размеры солнца
+        self.SUN_WIDTH_MAX = WIDTH * 0.2  # Максимальные размеры солнца
+        self.dw = -1  # шаг изменения размеров солнца
         self.width = self.SUN_WIDTH
         self.min_width = self.SUN_WIDTH * 0.8
 

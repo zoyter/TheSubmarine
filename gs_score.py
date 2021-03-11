@@ -5,7 +5,7 @@ from pygame.locals import *
 from const import *  # Общие константы для всех компонентов игры
 
 
-def get_top_players(): # Достаём из базы сведения об игроках
+def get_top_players():  # Достаём из базы сведения об игроках
     db = os.path.join(DATA_DIR, "db.sqlite")
     table = "info"
     query = "SELECT * FROM " + table + " ORDER BY score DESC"
@@ -13,7 +13,7 @@ def get_top_players(): # Достаём из базы сведения об иг
     cur = con.cursor()
     result = cur.execute(query).fetchall()
     con.close()
-    return result[:10] # возвращаем лучшие 10 результатов
+    return result[:10]  # возвращаем лучшие 10 результатов
 
 
 def score(screen):
