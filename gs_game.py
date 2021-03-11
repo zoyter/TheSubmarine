@@ -2,10 +2,7 @@ from pygame.locals import *
 
 from const import *  # Общие константы для всех компонентов игры
 
-SUN_WIDTH = WIDTH * 0.1
-SUN_WIDTH_MAX = WIDTH * 0.2
-SUN_DX = 1
-
+#
 ICONS_SIZE = WIDTH * 0.02
 
 WATER_LEVEL = HEIGHT // 3
@@ -17,9 +14,12 @@ SCORE_NEXT_LEVEL_DX = 50
 class TSun(pg.sprite.Sprite):  # Солнце
     def __init__(self, *group):
         super().__init__(*group)
+        self.SUN_WIDTH = WIDTH * 0.1
+        self.SUN_WIDTH_MAX = WIDTH * 0.2
+        self.SUN_DX = 1
         self.dw = -1
-        self.width = SUN_WIDTH
-        self.min_width = SUN_WIDTH * 0.8
+        self.width = self.SUN_WIDTH
+        self.min_width = self.SUN_WIDTH * 0.8
         self.image = pg.Surface((self.width, self.width))
         self.rect = self.image.get_rect()
         self.rect.center = (50, 50)
@@ -36,8 +36,8 @@ class TSun(pg.sprite.Sprite):  # Солнце
             if self.current_time >= self.animation_time:
                 self.current_time = 0
                 self.width += self.dw
-                if self.width >= SUN_WIDTH:
-                    self.width = SUN_WIDTH
+                if self.width >= self.SUN_WIDTH:
+                    self.width = self.SUN_WIDTH
                     self.dw = -self.dw
                 elif self.width <= self.min_width:
                     self.width = self.min_width
@@ -370,6 +370,7 @@ def draw_score(screen, player):
     x = WIDTH - txt_level.get_width()
     y = HEIGHT * 0.05
     screen.blit(txt_level, (x, y))
+
 
 def game(screen):
     global user_score
