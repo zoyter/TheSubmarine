@@ -226,7 +226,7 @@ class TText(pg.sprite.Sprite):  # Текстовые надписи
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
-    def set_new_text(self, text, cur_item=0): # Изменение надписи
+    def set_new_text(self, text, cur_item=0):  # Изменение надписи
         self.image.fill(COLORS.bg)
         self.text = text
         self.image_txt = self.font.render(self.text, True, self.color)
@@ -240,7 +240,7 @@ class TText(pg.sprite.Sprite):  # Текстовые надписи
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
-    def set_xy(self, x=0, y=0): # Новые координаты
+    def set_xy(self, x=0, y=0):  # Новые координаты
         self.rect.x = x
         self.rect.y = y
 
@@ -315,11 +315,12 @@ caption = TCaption('ru')  # все надписи на указанном язы
 isMusic = True  # вкл/выкл музыки
 music_volume = 4  # громкость музыки
 game_snd = TSnd()  # все звуки в игре
-game_music = TMusic()
-game_music.play()
-speed = 2
-user_score = 0
-username = 'NoName'
+game_music = TMusic() # Музыка
+game_music.play() # Запускаем воспроизведение музыки
+speed = 2 # Скорость движения рыб и т.п.
+user_score = 0 # Счёт
+username = 'NoName' # Имя игрока по умолчанию
 
+# Пользовательское событие
+# Буде рассылать тогда, когда надо переходить на следующий уровень
 next_level_event = pg.event.Event(pg.USEREVENT + 1, attr1='next_level_event')
-
