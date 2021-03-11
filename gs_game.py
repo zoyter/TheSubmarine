@@ -80,7 +80,7 @@ class TPlayer(pg.sprite.Sprite):
     def boom_start(self):
         self.isBoom = True
         self.life -= 1
-        pg.mixer.stop()
+        # pg.mixer.stop()
         game_snd.play_boom()
 
     def boom_stop(self):
