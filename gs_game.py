@@ -3,8 +3,6 @@ from pygame.locals import *
 from const import *  # Общие константы для всех компонентов игры
 
 #
-ICONS_SIZE = WIDTH * 0.02
-
 WATER_LEVEL = HEIGHT // 3
 
 SCORE_DX = 10
@@ -14,12 +12,13 @@ SCORE_NEXT_LEVEL_DX = 50
 class TSun(pg.sprite.Sprite):  # Солнце
     def __init__(self, *group):
         super().__init__(*group)
-        self.SUN_WIDTH = WIDTH * 0.1
-        self.SUN_WIDTH_MAX = WIDTH * 0.2
-        self.SUN_DX = 1
-        self.dw = -1
+        # константы размеров солнца
+        self.SUN_WIDTH = WIDTH * 0.1 # Размеры солнца
+        self.SUN_WIDTH_MAX = WIDTH * 0.2 # Максимальные размеры солнца
+        self.dw = -1 # шаг изменения размеров солнца
         self.width = self.SUN_WIDTH
         self.min_width = self.SUN_WIDTH * 0.8
+
         self.image = pg.Surface((self.width, self.width))
         self.rect = self.image.get_rect()
         self.rect.center = (50, 50)
@@ -344,7 +343,7 @@ def draw_gui(screen, player):
 
 
 def draw_oxygen(screen, player):
-    w = ICONS_SIZE
+    w = WIDTH * 0.02
     y = HEIGHT - w * 2
     for x in range(player.oxygen // 10):
         x1 = x * w
@@ -353,7 +352,7 @@ def draw_oxygen(screen, player):
 
 
 def draw_life(screen, player):
-    w = ICONS_SIZE
+    w = WIDTH * 0.02
     y = HEIGHT - w * 2
     for x in range(player.life, 0, -1):
         x1 = WIDTH - x * w

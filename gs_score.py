@@ -1,10 +1,11 @@
 import sqlite3
+
 from pygame.locals import *
 
 from const import *  # Общие константы для всех компонентов игры
 
 
-def get_top_players():
+def get_top_players(): # Достаём из базы сведения об игроках
     db = os.path.join(DATA_DIR, "db.sqlite")
     table = "info"
     query = "SELECT * FROM " + table + " ORDER BY score DESC"
@@ -12,25 +13,15 @@ def get_top_players():
     cur = con.cursor()
     result = cur.execute(query).fetchall()
     con.close()
-    return result[:10]
-
-
-# def save_user_score(user_score=0):
-#     if user_score <= 0:
-#         return
-#     db = os.path.join(DATA_DIR, "db.sqlite")
-#     con = sqlite3.connect(db)
-#     cur = con.cursor()
-#     cur.execute("insert into info values (Null, '%s', '%s') "%(username, user_score))
-#     con.commit()
-#     con.close()
-#     return
+    return result[:10] # возвращаем лучшие 10 результатов
 
 
 def score(screen):
     if DEBUG:
         print('Запустился вывод самых крутых игроков')
+
     all_sprites = pg.sprite.Group()
+
     x = WIDTH * 0.5
     y = HEIGHT * 0.1
     game_title = TText(text=caption.hiscore, color=COLORS.title, font=FONTS.font3, xy=(x, y))
@@ -50,6 +41,7 @@ def score(screen):
             TText(text=top_players[i][1] + ' ' + str(top_players[i][2]), color=COLORS.menu_items, font=FONTS.font5,
                   xy=(x, y + i * tmp_img.rect.height)))
     all_sprites.add(items)
+
     clock = pg.time.Clock()
     tick = pg.time.get_ticks()
     running = True
@@ -66,5 +58,3 @@ def score(screen):
         all_sprites.draw(screen)
         pg.display.flip()
         clock.tick(FPS)
-
-    return
