@@ -1,6 +1,7 @@
 import os
-import sys
 import random
+import sys
+
 import pygame as pg
 
 # Общие для всех модулей игры константы, переменные и функции
@@ -9,10 +10,12 @@ DEBUG = True  # вкл/выкл вывод отладочных сообщени
 
 SIZE = WIDTH, HEIGHT = 800, 600  # Размеры окна
 TILE_SIZE = 20  # Размер плитки, для загрузки карты мира (если пригодится :-) )
-# Пункты меню и их соответствие состояниям игры
+
+# Пункты меню
 MENU_ITEMS = ['Начать игру', 'Музыка', 'Счёт', 'Выход']
 
 FPS = 60  # Частоста обновления экрана
+
 # Пути к директориям с данными
 DATA_DIR = 'data'
 IMG_DIR = 'img'
@@ -21,20 +24,12 @@ MUSIC_DIR = 'music'
 SND_DIR = 'snd'
 LEVELS_DIR = 'levels'
 
-SUN_WIDTH = WIDTH * 0.1
-SUN_WIDTH_MAX = WIDTH * 0.2
-SUN_DX = 1
-WATER_LEVEL = HEIGHT // 3
-
+# Музыка
 MUSIC_ITEM_N = 1
 MUSIC_VOLUME_MAX = 10
-ICONS_SIZE = WIDTH * 0.02
-
-SCORE_DX = 10
-SCORE_NEXT_LEVEL_DX = 50
 
 
-class TCaption:
+class TCaption:  # Надписи, используемые в игре
     def __init__(self, lang='ru'):
         if lang == 'ru':
             self.ru()
@@ -77,20 +72,40 @@ class TColor():  # Цвета, используемые в игре
         self.life = (255, 0, 0)
         self.score = (255, 255, 255)
 
+    def next_level(self):  # Генерация цветов для следующего уровня
+        self.sky = self.make_color()
+        self.water = self.make_color()
+        # self.sun = self.make_color()
+        self.sun = tuple(map(lambda x: 255 - x, self.sky))
+        # self.oxygen = self.make_color()
+        self.oxygen = tuple(map(lambda x: 255 - x, self.water))
+        # self.life = self.make_color()
+        self.life = tuple(map(lambda x: 255 - x, self.sky))
+        self.score = self.make_color()
 
-COLORS = TColor()
+    def make_color(self):  # Генератор случайных цветов
+        r = random.randint(0, 255)
+        g = random.randint(0, 255)
+        b = random.randint(0, 255)
+        return r, g, b
+
+
+COLORS = TColor()  # Глобальная переменная с цветами, используемыми в игре
 
 
 class TGameStates():  # Состояния игры между которыми будем переключаться
     def __init__(self):
-        self.current = 0
         self.title = 0
         self.menu = 1
-        self.game = 2
-        self.score = 3
-        self.username = 4
-        self.gameover = 5
-        self.quit = 6
+        self.after_menu = 2
+        self.game = 3
+        self.after_game = 4
+        self.score = 5
+        self.username = 6
+        self.gameover = 7
+        self.quit = 8
+
+        self.current = self.title
 
     def __str__(self):
         r = f"Игра сейчас в состоянии - '{self.current}'"
@@ -99,14 +114,14 @@ class TGameStates():  # Состояния игры между которыми 
 
 class TFonts():  # Шрифты нескольких размеров
     def __init__(self, name):
-        fullname = os.path.join(DATA_DIR, FONTS_DIR)
-        fullname = os.path.join(fullname, name)
-        self.font1 = pg.font.Font(fullname, 60)
-        self.font2 = pg.font.Font(fullname, 50)
-        self.font3 = pg.font.Font(fullname, 40)
-        self.font4 = pg.font.Font(fullname, 30)
-        self.font5 = pg.font.Font(fullname, 20)
-        self.font6 = pg.font.Font(fullname, 10)
+        filename = os.path.join(DATA_DIR, FONTS_DIR)
+        filename = os.path.join(filename, name)
+        self.font1 = pg.font.Font(filename, 60)
+        self.font2 = pg.font.Font(filename, 50)
+        self.font3 = pg.font.Font(filename, 40)
+        self.font4 = pg.font.Font(filename, 30)
+        self.font5 = pg.font.Font(filename, 20)
+        self.font6 = pg.font.Font(filename, 10)
 
 
 def load_image(name, colorkey=None):  # Загрузка картинок
@@ -126,7 +141,7 @@ def load_image(name, colorkey=None):  # Загрузка картинок
     return image
 
 
-class TSnd():
+class TSnd():  # Различные звуки
     def __init__(self):
         path = os.path.join(DATA_DIR, SND_DIR)
         filename = os.path.join(path, 'menu1.wav')
@@ -166,8 +181,7 @@ class TSnd():
         self.submarine.play()
 
 
-# Загружаем музыку
-class TMusic():
+class TMusic():  # Музыка
     def __init__(self):
         path = os.path.join(DATA_DIR, MUSIC_DIR)
         self.music = self.get_music(path)
@@ -187,8 +201,8 @@ class TMusic():
         # pg.mixer.Channel(0).play(self.music[random.randint(0,len(self.music)-1)])
 
     def stop(self):
-        # pg.mixer.music.stop()
-        pg.mixer.Channel(0).stop()
+        pg.mixer.music.stop()
+        # pg.mixer.Channel(0).stop()
 
     def set_volume(self, volume):
         pg.mixer.music.set_volume(volume / 10)
@@ -212,7 +226,7 @@ class TText(pg.sprite.Sprite):  # Текстовые надписи
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
-    def set_new_text(self, text, cur_item=0):
+    def set_new_text(self, text, cur_item=0): # Изменение надписи
         self.image.fill(COLORS.bg)
         self.text = text
         self.image_txt = self.font.render(self.text, True, self.color)
@@ -226,7 +240,7 @@ class TText(pg.sprite.Sprite):  # Текстовые надписи
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
-    def set_xy(self, x=0, y=0):
+    def set_xy(self, x=0, y=0): # Новые координаты
         self.rect.x = x
         self.rect.y = y
 
@@ -295,7 +309,7 @@ class TBlinkText(pg.sprite.Sprite):
         screen.blit(self.image, (100, 0))
 
 
-# Всякие игровые переменные
+# Всякие общие игровые переменные
 game_state = TGameStates()  # состояние игры
 caption = TCaption('ru')  # все надписи на указанном языке
 isMusic = True  # вкл/выкл музыки
@@ -307,6 +321,5 @@ speed = 2
 user_score = 0
 username = 'NoName'
 
-# next_level_event = pg.USEREVENT + 1
 next_level_event = pg.event.Event(pg.USEREVENT + 1, attr1='next_level_event')
-# pg.event.post(next_level_event)
+

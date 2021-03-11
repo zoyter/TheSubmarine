@@ -4,6 +4,16 @@ from pygame.locals import *
 
 from const import *  # Общие константы для всех компонентов игры
 
+SUN_WIDTH = WIDTH * 0.1
+SUN_WIDTH_MAX = WIDTH * 0.2
+SUN_DX = 1
+
+ICONS_SIZE = WIDTH * 0.02
+
+WATER_LEVEL = HEIGHT // 3
+
+SCORE_DX = 10
+SCORE_NEXT_LEVEL_DX = 50
 
 class TSun(pg.sprite.Sprite):  # Солнце
     def __init__(self, *group):
@@ -240,6 +250,7 @@ class TFish(pg.sprite.Sprite):
             if e == next_level_event:
                 print('я рыба и вижу переход на след. уровень')
                 self.dx = - random.randint(1, kwargs['player'].level)
+                COLORS.next_level()
                 # self.next_level(kwargs['player'])
 
 

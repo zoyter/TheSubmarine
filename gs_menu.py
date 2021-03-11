@@ -75,6 +75,7 @@ def menu(screen):
                         if isMusic:
                             game_music.play()
                         else:
+                            pg.mixer.stop()
                             game_music.stop()
                     if MENU_ITEMS[cur_menu_item] == MENU_ITEMS[-1]:
                         running = False

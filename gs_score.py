@@ -15,23 +15,21 @@ def get_top_players():
     return result[:10]
 
 
-def save_user_score(user_score=0):
-    if user_score <= 0:
-        return
-    db = os.path.join(DATA_DIR, "db.sqlite")
-    table = "info"
-    con = sqlite3.connect(db)
-    cur = con.cursor()
-    cur.execute("insert into info values (Null, '%s', '%s') "%(username, user_score))
-    con.commit()
-    con.close()
-    return
+# def save_user_score(user_score=0):
+#     if user_score <= 0:
+#         return
+#     db = os.path.join(DATA_DIR, "db.sqlite")
+#     con = sqlite3.connect(db)
+#     cur = con.cursor()
+#     cur.execute("insert into info values (Null, '%s', '%s') "%(username, user_score))
+#     con.commit()
+#     con.close()
+#     return
 
 
-def score(screen, user_score):
+def score(screen):
     if DEBUG:
         print('Запустился вывод самых крутых игроков')
-    save_user_score(user_score)
     all_sprites = pg.sprite.Group()
     x = WIDTH * 0.5
     y = HEIGHT * 0.1
