@@ -56,7 +56,8 @@ def menu(screen):
                 running = False
                 game_state.current = game_state.quit
             if event.type == KEYDOWN:
-                pg.mixer.Sound.play(game_snd.menu_updown)
+                # snd=pg.mixer.Sound.play(game_snd.menu_updown)
+                game_snd.play_updown()
                 if event.key == K_ESCAPE:
                     running = False
                     game_state.current = game_state.quit

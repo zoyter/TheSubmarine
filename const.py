@@ -30,6 +30,9 @@ MUSIC_ITEM_N = 1
 MUSIC_VOLUME_MAX = 10
 ICONS_SIZE = WIDTH * 0.02
 
+SCORE_DX = 10
+SCORE_NEXT_LEVEL_DX = 50
+
 
 class TCaption:
     def __init__(self, lang='ru'):
@@ -45,6 +48,8 @@ class TCaption:
         self.music_off = 'выкл.'
         self.music_volume = 'громкость'
         self.hiscore = 'Счёт'
+        self.gameover = 'Игра завершена'
+        self.enteryourname = 'Введи своё имя'
         MENU_ITEMS = ['Начать игру', 'Музыка', 'Счёт', 'Выход']
 
     def en(self):
@@ -54,6 +59,8 @@ class TCaption:
         self.music_off = 'off'
         self.music_volume = 'volume'
         self.hiscore = 'Hi Score'
+        self.gameover = 'Game Over'
+        self.enteryourname = 'Enter your name'
         MENU_ITEMS = ['Start game', 'Music', 'Score', 'Exit']
 
 
@@ -81,8 +88,9 @@ class TGameStates():  # Состояния игры между которыми 
         self.menu = 1
         self.game = 2
         self.score = 3
-        self.gameover = 4
-        self.quit = 5
+        self.username = 4
+        self.gameover = 5
+        self.quit = 6
 
     def __str__(self):
         r = f"Игра сейчас в состоянии - '{self.current}'"
@@ -121,8 +129,41 @@ def load_image(name, colorkey=None):  # Загрузка картинок
 class TSnd():
     def __init__(self):
         path = os.path.join(DATA_DIR, SND_DIR)
-        fullname = os.path.join(path, 'menu1.wav')
-        self.menu_updown = pg.mixer.Sound(fullname)
+        filename = os.path.join(path, 'menu1.wav')
+        self.menu_updown = pg.mixer.Sound(filename)
+        filename = os.path.join(path,
+                                'atmosfernyiy-zvuk-glubinyi-kotoruyu-slyishit-dayver-vo-vremya-plavaniya-5864.ogg')
+        self.underwatter = pg.mixer.Sound(filename)
+        filename = os.path.join(path, 'iz-ballona-vyihodit-vozduh-5861.ogg')
+        self.abovewater = pg.mixer.Sound(filename)
+        filename = os.path.join(path, 'boom.wav')
+        self.boom = pg.mixer.Sound(filename)
+        filename = os.path.join(path, 'uskorenie-kosmicheskogo-korablya-2701.wav')
+        self.submarine = pg.mixer.Sound(filename)
+        self.channel = pg.mixer.Sound.play(self.menu_updown, 0)
+
+        filename = os.path.join(path, 'volshebnaya-palochka-ne-ispolnila-jelanie-zvuk-oshibki-3577.wav')
+        self.collect = pg.mixer.Sound(filename)
+
+        filename = os.path.join(path, 'vam-zachislena-pobeda-4551.wav')
+        self.next_level = pg.mixer.Sound(filename)
+
+    def play_updown(self):
+        self.channel = pg.mixer.Sound.play(self.menu_updown)
+
+    def play_underwater(self):
+        self.underwatter.play(-1)
+        # self.channel = pg.mixer.Sound.play(self.underwatter)
+
+    def play_abovewater(self):
+        self.abovewater.play()
+        # self.channel = pg.mixer.Sound.play(self.abovewater)
+
+    def play_boom(self):
+        self.boom.play()
+
+    def play_submarine(self):
+        self.submarine.play()
 
 
 # Загружаем музыку
@@ -134,16 +175,20 @@ class TMusic():
     def get_music(self, path):
         files = os.listdir(path)
         r = [os.path.join(path, song) for song in files if song.endswith('.ogg')]
+        # r = [pg.mixer.Sound(os.path.join(path, song)) for song in files if song.endswith('.ogg')]
         return r
 
     def play(self):
         self.stop()
-        pg.mixer.music.load(self.music[random.randint(0,len(self.music)-1)])
+        pg.mixer.music.load(self.music[random.randint(0, len(self.music) - 1)])
+        self.set_volume(music_volume)
         pg.mixer.music.play()
+        print(dir(pg.mixer.music.play))
+        # pg.mixer.Channel(0).play(self.music[random.randint(0,len(self.music)-1)])
 
     def stop(self):
-        pg.mixer.music.stop()
-
+        # pg.mixer.music.stop()
+        pg.mixer.Channel(0).stop()
 
     def set_volume(self, volume):
         pg.mixer.music.set_volume(volume / 10)
@@ -254,7 +299,14 @@ class TBlinkText(pg.sprite.Sprite):
 game_state = TGameStates()  # состояние игры
 caption = TCaption('ru')  # все надписи на указанном языке
 isMusic = True  # вкл/выкл музыки
-music_volume = 5  # громоксть музыки
+music_volume = 4  # громкость музыки
 game_snd = TSnd()  # все звуки в игре
 game_music = TMusic()
 game_music.play()
+speed = 2
+user_score = 0
+username = 'NoName'
+
+# next_level_event = pg.USEREVENT + 1
+next_level_event = pg.event.Event(pg.USEREVENT + 1, attr1='next_level_event')
+# pg.event.post(next_level_event)
