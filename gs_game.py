@@ -1,5 +1,3 @@
-import random
-
 from pygame.locals import *
 
 from const import *  # Общие константы для всех компонентов игры
@@ -14,6 +12,7 @@ WATER_LEVEL = HEIGHT // 3
 
 SCORE_DX = 10
 SCORE_NEXT_LEVEL_DX = 50
+
 
 class TSun(pg.sprite.Sprite):  # Солнце
     def __init__(self, *group):
@@ -56,6 +55,7 @@ class TPlayer(pg.sprite.Sprite):
         self.images.append(load_image('player1.png'))
         self.images.append(load_image('player2.png'))
         self.images.append(load_image('player3.png'))
+        self.images.append(load_image('player_boom.png'))
         self.image = self.images[0]
 
         self.rect = self.image.get_rect()
@@ -87,14 +87,15 @@ class TPlayer(pg.sprite.Sprite):
 
         game_snd.play_underwater()
 
-    def boom_start(self):
-        self.isBoom = True
+    def boom_start(self):  # Запуск процедуры взрыва
+        self.isBoom = not self.isBoom
+        self.image = self.images[-1]
         self.life -= 1
-        # pg.mixer.stop()
         game_snd.play_boom()
 
-    def boom_stop(self):
-        self.isBoom = False
+    def boom_stop(self):  # Остановка процедуры взрыва
+        self.isBoom = not self.isBoom
+        self.image = self.images[0]
         self.BoomTime = self.BoomTimeMax
 
     def update(self, *args, **kwargs):
@@ -108,15 +109,15 @@ class TPlayer(pg.sprite.Sprite):
             if self.down:
                 self.image = self.images[2]
                 self.rect.y += self.dy
-                if self.rect.y + self.rect.height >HEIGHT:
-                    self.rect.y = HEIGHT-self.rect.height
+                if self.rect.y + self.rect.height > HEIGHT:
+                    self.rect.y = HEIGHT - self.rect.height
             if self.right:
                 self.rect.x += self.dx
-                if self.rect.x+ self.rect.width >WIDTH:
-                    self.rect.x = WIDTH-self.rect.width
+                if self.rect.x + self.rect.width > WIDTH:
+                    self.rect.x = WIDTH - self.rect.width
             if self.left:
                 self.rect.x -= self.dx
-                if self.rect.x<0:
+                if self.rect.x < 0:
                     self.rect.x = 0
             # oxygen
             self.current_time += kwargs['dt']
@@ -138,13 +139,13 @@ class TPlayer(pg.sprite.Sprite):
 
 
 class TBoom(pg.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y, t=0.03):
+    def __init__(self, sheet, columns, rows, t=0.03):
         pg.sprite.Sprite.__init__(self)
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
-        self.rect = self.rect.move(x, y)
+        self.rect = self.rect.move(-100, -100)
         self.animation_time = t
         self.current_time = 0
 
@@ -157,7 +158,7 @@ class TBoom(pg.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pg.Rect(
                     frame_location, self.rect.size)))
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs):  #
         if kwargs['player'].isBoom:
             self.rect = kwargs['player'].rect
             self.current_time += kwargs['dt']
@@ -166,9 +167,11 @@ class TBoom(pg.sprite.Sprite):
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
                 self.image = self.frames[self.cur_frame]
             if self.cur_frame >= len(self.frames) - 1:
+                self.rect = kwargs['player'].rect
                 kwargs['player'].boom_stop()
                 kwargs['player'].rect.x = 0
                 kwargs['player'].rect.y = WATER_LEVEL
+                self.cur_frame = 0
 
 
 class TBird(pg.sprite.Sprite):
@@ -240,6 +243,7 @@ class TFish(pg.sprite.Sprite):
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
             self.mask = pg.mask.from_surface(self.image)
+        # Проверям столкновение рыбы с подводной лодкой
         if pg.sprite.collide_mask(self, kwargs['player']):
             if DEBUG:
                 print('Столкновение с рыбой')
@@ -248,17 +252,16 @@ class TFish(pg.sprite.Sprite):
             self.die()
         for e in kwargs['event']:
             if e == next_level_event:
-                print('я рыба и вижу переход на след. уровень')
+                if DEBUG:
+                    print('я рыба и вижу переход на след. уровень')
                 self.dx = - random.randint(1, kwargs['player'].level)
                 COLORS.next_level()
-                # self.next_level(kwargs['player'])
-
 
     def die(self):
         self.rect.x = WIDTH
         self.rect.y = random.randint(WATER_LEVEL, HEIGHT - self.image.get_height())
 
-    def next_level(self,player):
+    def next_level(self, player):
         self.dx = -player.level
 
 
@@ -314,13 +317,12 @@ class TDiver(pg.sprite.Sprite):
             if DEBUG:
                 print('Столкновение с дайвером')
             kwargs['player'].score += SCORE_DX
-            if kwargs['player'].score>=kwargs['player'].score_next_level:
+            if kwargs['player'].score >= kwargs['player'].score_next_level:
                 kwargs['player'].level += 1
                 kwargs['player'].score_next_level += SCORE_NEXT_LEVEL_DX
                 game_snd.next_level.play()
                 pg.event.post(next_level_event)
             self.die()
-
 
     def die(self):
         game_snd.collect.play()
@@ -369,9 +371,8 @@ def draw_score(screen, player):
     y = HEIGHT * 0.05
     screen.blit(txt_level, (x, y))
 
-
 def game(screen):
-    global  user_score
+    global user_score
     if DEBUG:
         print('Запустилась игра')
     all_sprites = pg.sprite.Group()
@@ -401,7 +402,7 @@ def game(screen):
     divers.append(TDiver(load_image("diver2.png"), 2, 3, t=0.1))
     all_good.add(divers)
 
-    boom = TBoom(load_image("boom.png"), 16, 1, 50, 50, t=0.02)
+    boom = TBoom(load_image("boom.png"), 16, 1, t=0.02)
     all_boom.add(boom)
 
     all_players = pg.sprite.Group()
@@ -409,6 +410,7 @@ def game(screen):
 
     clock = pg.time.Clock()
     tick = pg.time.get_ticks()
+
     running = True
     while running:
         if game_state.current != game_state.game:
@@ -446,7 +448,7 @@ def game(screen):
 
         all_sprites.update(dt=dt, player=player)
         if not player.isBoom:
-            all_enemy.update(dt=dt, player=player,event=all_event)
+            all_enemy.update(dt=dt, player=player, event=all_event)
             all_good.update(dt=dt, player=player, event=all_event)
             all_players.update(dt=dt, player=player, event=all_event)
         else:
