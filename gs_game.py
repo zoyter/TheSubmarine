@@ -70,6 +70,20 @@ class TPlayer(pg.sprite.Sprite):
         self.current_time = 0
         self.oxygen_dx = 0.001
 
+        self.load_sounds()
+        self.play()
+
+    def load_sounds(self):
+        path = os.path.join(DATA_DIR, SND_DIR)
+        filename = os.path.join(path, "atmosfernyiy-zvuk-glubinyi-kotoruyu-slyishit-dayver-vo-vremya-plavaniya-5864.ogg")
+        self.snd_underwater = pg.mixer.Sound(filename)
+
+    def play(self):
+        pg.mixer.Channel(1).play(self.snd_underwater)
+
+    def stop(self):
+        pg.mixer.Channel(1).stop()
+
     def boom_start(self):
         self.isBoom = True
         self.life -=1
@@ -106,6 +120,10 @@ class TPlayer(pg.sprite.Sprite):
                             self.life -= 1
                             self.oxygen = 100
                 self.current_time = 0
+            if self.rect.y<WATER_LEVEL:
+                self.play()
+            else:
+                self.stop()
             if self.life < 0:
                 self.isAlive = False
                 game_state.current=game_state.gameover
@@ -305,7 +323,6 @@ def draw_score(screen, player):
 def game(screen):
     if DEBUG:
         print('Запустилась игра')
-
     all_sprites = pg.sprite.Group()
     sun = TSun(all_sprites)
     # групп для тех, кто причинят вред

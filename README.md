@@ -69,8 +69,8 @@ pyinstaller --onefile --noconsole main.py
 - [Deep Underwater Panda](https://www.jamendo.com/album/187523/deep-underwater)
 
 ###Звуки:
-- ...
-- ...
+- [menu1.wav](https://zvukogram.com/index.php?r=site/download&id=4605&type=wav)
+- [много разных звуковых эффектов](https://zvukogram.com/category/zvuki-vyibora-knopki-v-menyu/)
 
 ###Изображения:
 

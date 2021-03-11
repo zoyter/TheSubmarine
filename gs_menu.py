@@ -45,6 +45,8 @@ def menu(screen):
     all_sprites.add(items)
     set_active_item(items, cur_menu_item)
 
+
+
     clock = pg.time.Clock()
     tick = pg.time.get_ticks()
     running = True
@@ -54,6 +56,7 @@ def menu(screen):
                 running = False
                 game_state.current = game_state.quit
             if event.type == KEYDOWN:
+                pg.mixer.Sound.play(game_snd.menu_updown)
                 if event.key == K_ESCAPE:
                     running = False
                     game_state.current = game_state.quit
@@ -68,6 +71,10 @@ def menu(screen):
                 if event.key == K_RETURN:
                     if MENU_ITEMS[cur_menu_item] == MENU_ITEMS[MUSIC_ITEM_N]:
                         isMusic = not isMusic
+                        if isMusic:
+                            game_music.play()
+                        else:
+                            game_music.stop()
                     if MENU_ITEMS[cur_menu_item] == MENU_ITEMS[-1]:
                         running = False
                         game_state.current = game_state.quit
@@ -81,10 +88,12 @@ def menu(screen):
                     music_volume -= 1
                     if music_volume <= 0:
                         music_volume = 0
+                    game_music.set_volume(music_volume)
                 if event.key == K_RIGHT:
                     music_volume += 1
                     if music_volume >= MUSIC_VOLUME_MAX:
                         music_volume = MUSIC_VOLUME_MAX
+                    game_music.set_volume(music_volume)
                 info.set_new_text(caption.music_volume + ' ' + str(music_volume))
                 set_active_item(items, cur_menu_item)
 

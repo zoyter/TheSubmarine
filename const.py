@@ -1,6 +1,6 @@
 import os
 import sys
-
+import random
 import pygame as pg
 
 # Общие для всех модулей игры константы, переменные и функции
@@ -18,30 +18,44 @@ DATA_DIR = 'data'
 IMG_DIR = 'img'
 FONTS_DIR = 'fonts'
 MUSIC_DIR = 'music'
+SND_DIR = 'snd'
 LEVELS_DIR = 'levels'
 
+SUN_WIDTH = WIDTH * 0.1
+SUN_WIDTH_MAX = WIDTH * 0.2
+SUN_DX = 1
+WATER_LEVEL = HEIGHT // 3
+
+MUSIC_ITEM_N = 1
+MUSIC_VOLUME_MAX = 10
+ICONS_SIZE = WIDTH * 0.02
+
+
 class TCaption:
-    def __init__(self,lang='ru'):
-        if lang=='ru':
+    def __init__(self, lang='ru'):
+        if lang == 'ru':
             self.ru()
         else:
             self.en()
+
     def ru(self):
-        self.game_name='The Submarin'
+        self.game_name = 'The Submarin'
         self.press_any_key = 'Нажми любую клавишу'
-        self.music_on='вкл.'
-        self.music_off='выкл.'
+        self.music_on = 'вкл.'
+        self.music_off = 'выкл.'
         self.music_volume = 'громкость'
         self.hiscore = 'Счёт'
         MENU_ITEMS = ['Начать игру', 'Музыка', 'Счёт', 'Выход']
+
     def en(self):
-        self.game_name='The Submarin'
+        self.game_name = 'The Submarin'
         self.press_any_key = 'Press any key'
-        self.music_on='on'
-        self.music_off='off'
+        self.music_on = 'on'
+        self.music_off = 'off'
         self.music_volume = 'volume'
         self.hiscore = 'Hi Score'
         MENU_ITEMS = ['Start game', 'Music', 'Score', 'Exit']
+
 
 class TColor():  # Цвета, используемые в игре
     def __init__(self):
@@ -87,16 +101,6 @@ class TFonts():  # Шрифты нескольких размеров
         self.font6 = pg.font.Font(fullname, 10)
 
 
-FONTS = TFonts('Ru.ttf')
-game_state = TGameStates()
-caption = TCaption('ru')
-isMusic = True
-music_volume = 5
-MUSIC_ITEM_N = 1
-MUSIC_VOLUME_MAX=10
-ICONS_SIZE = WIDTH*0.02
-
-
 def load_image(name, colorkey=None):  # Загрузка картинок
     fullname = os.path.join(DATA_DIR, IMG_DIR)
     fullname = os.path.join(fullname, name)
@@ -112,6 +116,40 @@ def load_image(name, colorkey=None):  # Загрузка картинок
     else:
         image = image.convert_alpha()
     return image
+
+
+class TSnd():
+    def __init__(self):
+        path = os.path.join(DATA_DIR, SND_DIR)
+        fullname = os.path.join(path, 'menu1.wav')
+        self.menu_updown = pg.mixer.Sound(fullname)
+
+
+# Загружаем музыку
+class TMusic():
+    def __init__(self):
+        path = os.path.join(DATA_DIR, MUSIC_DIR)
+        self.music = self.get_music(path)
+
+    def get_music(self, path):
+        files = os.listdir(path)
+        r = [os.path.join(path, song) for song in files if song.endswith('.ogg')]
+        return r
+
+    def play(self):
+        self.stop()
+        pg.mixer.music.load(self.music[random.randint(0,len(self.music)-1)])
+        pg.mixer.music.play()
+
+    def stop(self):
+        pg.mixer.music.stop()
+
+
+    def set_volume(self, volume):
+        pg.mixer.music.set_volume(volume / 10)
+
+
+FONTS = TFonts('Ru.ttf')
 
 
 class TText(pg.sprite.Sprite):  # Текстовые надписи
@@ -143,14 +181,13 @@ class TText(pg.sprite.Sprite):  # Текстовые надписи
         self.image.set_colorkey(colorkey)
         self.image.blit(self.image_txt, (0, 0))
 
-
     def set_xy(self, x=0, y=0):
         self.rect.x = x
         self.rect.y = y
 
-    def active_item(self, isActive = False):
+    def active_item(self, isActive=False):
         if isActive:
-            self.color=COLORS.title
+            self.color = COLORS.title
         else:
             self.color = COLORS.menu_items
         self.image_txt = self.font.render(self.text, True, self.color)
@@ -212,7 +249,12 @@ class TBlinkText(pg.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, (100, 0))
 
-SUN_WIDTH = WIDTH * 0.1
-SUN_WIDTH_MAX = WIDTH * 0.2
-SUN_DX = 1
-WATER_LEVEL = HEIGHT // 3
+
+# Всякие игровые переменные
+game_state = TGameStates()  # состояние игры
+caption = TCaption('ru')  # все надписи на указанном языке
+isMusic = True  # вкл/выкл музыки
+music_volume = 5  # громоксть музыки
+game_snd = TSnd()  # все звуки в игре
+game_music = TMusic()
+game_music.play()
