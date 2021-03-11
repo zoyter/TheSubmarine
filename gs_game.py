@@ -98,10 +98,16 @@ class TPlayer(pg.sprite.Sprite):
             if self.down:
                 self.image = self.images[2]
                 self.rect.y += self.dy
+                if self.rect.y + self.rect.height >HEIGHT:
+                    self.rect.y = HEIGHT-self.rect.height
             if self.right:
                 self.rect.x += self.dx
+                if self.rect.x+ self.rect.width >WIDTH:
+                    self.rect.x = WIDTH-self.rect.width
             if self.left:
                 self.rect.x -= self.dx
+                if self.rect.x<0:
+                    self.rect.x = 0
             # oxygen
             self.current_time += kwargs['dt']
             if self.current_time >= self.oxygen_dx:

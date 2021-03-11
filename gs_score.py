@@ -18,6 +18,13 @@ def get_top_players():
 def save_user_score(user_score=0):
     if user_score <= 0:
         return
+    db = os.path.join(DATA_DIR, "db.sqlite")
+    table = "info"
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    cur.execute("insert into info values (Null, '%s', '%s') "%(username, user_score))
+    con.commit()
+    con.close()
     return
 
 
