@@ -16,8 +16,8 @@ pg.display.set_caption("The Submarine")
 
 def main():
     screen = pg.display.set_mode(SIZE)
-
-    game_state.current=game_state.gameover
+    user_score = 0
+    # game_state.current=game_state.gameover
     running = True
     while running:
         for event in pg.event.get():
@@ -32,13 +32,13 @@ def main():
         if game_state.current == game_state.menu:
             menu(screen)
         if game_state.current == game_state.game:
-            game(screen)
+            user_score = game(screen)
         if game_state.current == game_state.score:
-            score(screen)
+            score(screen,user_score)
         if game_state.current == game_state.username:
             enter_username(screen)
         if game_state.current == game_state.gameover:
-            gameover(screen)
+            gameover(screen, user_score)
         if game_state.current == game_state.quit:
             print('quit')
             running = False

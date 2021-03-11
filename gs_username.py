@@ -1,7 +1,7 @@
 from const import *  # Общие константы для всех компонентов игры
 from pygame.locals import *
 
-abc = 'qwertyuiopasdfghjklzxcvbnm '#chr(8)
+abc = 'qwertyuiopasdfghjklzxcvbnm '  # chr(8)
 
 
 def input_name(key, username):
@@ -34,7 +34,6 @@ def enter_username(screen):
     caption2 = TBlinkText(text=caption.press_any_key, color=COLORS.menu_items, font=FONTS.font4, xy=(x, y))
     all_sprites.add(caption2)
 
-
     running = True
     clock = pg.time.Clock()
     tick = pg.time.get_ticks()
@@ -48,18 +47,18 @@ def enter_username(screen):
                 running = False
                 game_state.current = game_state.quit
             if event.type == KEYDOWN:
-                username = input_name(event.key,username)
-                if len(username)>0:
+                username = input_name(event.key, username)
+                if len(username) > 0:
                     name_input.set_new_text(username)
                 else:
                     name_input.set_new_text(" ")
-                x = WIDTH * 0.5 - name_input.rect.width//2
+                x = WIDTH * 0.5 - name_input.rect.width // 2
                 y = HEIGHT * 0.5
-                name_input.rect.x=x
-                name_input.rect.y=y
-                if event.key==K_RETURN or event.key==K_ESCAPE:
+                name_input.rect.x = x
+                name_input.rect.y = y
+                if event.key == K_RETURN or event.key == K_ESCAPE:
                     running = False
-                    game_state.current=game_state.score
+                    game_state.current = game_state.score
 
         screen.fill(COLORS.bg)
         all_sprites.update()

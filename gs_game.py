@@ -354,6 +354,7 @@ def draw_score(screen, player):
 
 
 def game(screen):
+    global  user_score
     if DEBUG:
         print('Запустилась игра')
     all_sprites = pg.sprite.Group()
@@ -449,3 +450,4 @@ def game(screen):
         draw_gui(screen, player)
         pg.display.flip()
         clock.tick(FPS)
+    return player.score

@@ -13,7 +13,7 @@ def input_name(key, username):
     return username
 
 
-def gameover(screen, player=None):
+def gameover(screen, user_score):
     if DEBUG:
         print('Игра завершена')
 
