@@ -83,4 +83,5 @@ pyinstaller --onefile --noconsole main.py
 - [diver.png](https://cdn4.vectorstock.com/i/1000x1000/94/83/diver-boy-swimming-sprite-vector-3509483.jpg)
 
 ###P.S.
+
 Персональный проект в рамках подготовки преподавателей второго года обучения ЯЛ.
