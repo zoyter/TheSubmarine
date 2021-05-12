@@ -67,16 +67,16 @@ pyinstaller --onefile --noconsole main.py
 
 ## Ресурсы
 
-###Музыка:
+### Музыка:
 
 - [underwater_mind (2011) the guta jasna](https://www.jamendo.com/track/854045/underwater_mind)
 - [Deep Underwater Panda](https://www.jamendo.com/album/187523/deep-underwater)
 
-###Звуки:
+### Звуки:
 - [menu1.wav](https://zvukogram.com/index.php?r=site/download&id=4605&type=wav)
 - [много разных звуковых эффектов](https://zvukogram.com/category/zvuki-vyibora-knopki-v-menyu/)
 
-###Изображения:
+### Изображения:
 
 - [player1.png](откуда то из сети)
 - [bird.png](откуда то из сети)
